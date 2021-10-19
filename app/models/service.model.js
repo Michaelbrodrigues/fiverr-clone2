@@ -14,11 +14,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         thumbnail: {
             type: Sequelize.STRING,
-            allowNull: false
         },
         fileFormat: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: false,
         }
     }, {
         tableName: 'Service'

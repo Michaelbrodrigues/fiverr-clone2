@@ -9,6 +9,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             allowNull: false,
         },
+        price: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+        },
         description: {
             type: Sequelize.TEXT
         }

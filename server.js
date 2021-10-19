@@ -57,7 +57,7 @@ app.post('/migration', (req, res) => {
         .then((data) => {
             const hashedPassword = bcrypt.hashSync("password", 10);
             const user = {
-                id: '_' + Math.random().toString(36).substr(2, 9),
+                id: "_usrbtjgkj2d9",
                 fullName: "Gilang Chandra Syahputra",
                 username: "gilangcsy",
                 email: "gilangchandra9@gmail.com",
@@ -65,7 +65,6 @@ app.post('/migration', (req, res) => {
                 RoleId: 1
             }
             const category = {
-                id: '_' + Math.random().toString(36).substr(2, 9),
                 name: "Logo Design",
                 group: "Logo & Brand Design"
             }
@@ -105,29 +104,32 @@ app.use('/uploads', express.static('uploads'));
 // require('./app/routes/skill.routes')(app);
 // require('./app/routes/map.routes')(app);
 require('./app/routes/message.routes')(app);
+require('./app/routes/service.routes')(app);
+require('./app/routes/service-plan.routes')(app);
+require('./app/routes/purchasing.routes')(app);
 
 // sends out the 10 most recent messages from recent to oldest
-const emitMostRecentMessges = () => {
-    controller.readSocketMessage()
-        .then((result) => io.emit("chat message", result))
-        .catch(console.log);
-};
+// const emitMostRecentMessges = () => {
+//     controller.readSocketMessage()
+//         .then((result) => io.emit("chat message", result))
+//         .catch(console.log);
+// };
 
 // connects, creates message, and emits top 10 messages
-io.on("connection", (socket) => {
-    console.log("a user connected!");
-    socket.on('chat message', (msg) => {
-        controller.createSocketMessage(JSON.parse(msg))
-            .then(() => {
-                emitMostRecentMessges();
-            })
-            .catch((err) => console.log(err));
-    });
-    // close event when user disconnects from app
-    socket.on("disconnect", () => {
-        console.log("user disconnected");
-    });
-});
+// io.on("connection", (socket) => {
+//     console.log("a user connected!");
+//     socket.on('chat message', (msg) => {
+//         controller.createSocketMessage(JSON.parse(msg))
+//             .then(() => {
+//                 emitMostRecentMessges();
+//             })
+//             .catch((err) => console.log(err));
+//     });
+//     // close event when user disconnects from app
+//     socket.on("disconnect", () => {
+//         console.log("user disconnected");
+//     });
+// });
 
 //Inisiasi port yang akan dipakai
 const PORT = 8000;
