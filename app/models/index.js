@@ -31,9 +31,13 @@ db.servicePlan = require('./service-plan.model')(sequelize, Sequelize);
 db.servicePlanFeature = require('./service-plan-feature.model')(sequelize, Sequelize);
 db.purchasing = require('./purchasing.model')(sequelize, Sequelize);
 db.payment = require('./payment.model')(sequelize, Sequelize);
+db.message = require('./message.model')(sequelize, Sequelize);
 
 db.role.hasMany(db.user);
 db.user.belongsTo(db.role);
+
+db.user.hasMany(db.message);
+db.message.belongsTo(db.user);
 
 db.category.hasOne(db.service);
 db.service.belongsTo(db.category);
@@ -47,9 +51,10 @@ db.service.belongsTo(db.user);
 db.servicePlan.hasMany(db.servicePlanFeature);
 db.servicePlanFeature.belongsTo(db.servicePlan);
 
-db.service.hasMany(db.purchasing);
+db.servicePlan.hasMany(db.purchasing);
 db.user.hasMany(db.purchasing);
-db.purchasing.belongsTo(db.service);
+
+db.purchasing.belongsTo(db.servicePlan);
 db.purchasing.belongsTo(db.user);
 
 db.purchasing.hasMany(db.payment);

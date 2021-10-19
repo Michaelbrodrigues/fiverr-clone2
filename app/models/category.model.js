@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false
         },
         group: {
-            type: Sequelize.INTEGER
+            type: Sequelize.STRING
         }
     }, {
         tableName: 'Category'
