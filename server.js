@@ -107,6 +107,7 @@ require('./app/routes/message.routes')(app);
 require('./app/routes/service.routes')(app);
 require('./app/routes/service-plan.routes')(app);
 require('./app/routes/purchasing.routes')(app);
+require('./app/routes/payment.routes')(app);
 
 // sends out the 10 most recent messages from recent to oldest
 // const emitMostRecentMessges = () => {
