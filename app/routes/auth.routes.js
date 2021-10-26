@@ -1,6 +1,8 @@
 
 const { verifySignUp, authJwt } = require('../middleware');
 const users = require('../controllers/auth.controller');
+const version = require('../config/version.config');
+
 module.exports = app => {
 
     let router = require('express').Router();
@@ -18,5 +20,5 @@ module.exports = app => {
     //     res.send("success")
     // });
 
-    app.use('/api/auth', router);
+    app.use(`${version.version}/auth`, router);
 }

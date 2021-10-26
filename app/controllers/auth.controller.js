@@ -55,11 +55,18 @@ exports.login = (req, res) => {
                 const validatingPassword = bcrypt.compareSync(password, user.password); // true
                 if (validatingPassword) {
                     const tokenJwt = jwt.sign({ id: user.id }, config.secret, {
-                        expiresIn: 3600 // 24 hours
+                        expiresIn: 10800 // 24 hours
                     });
-                    res.status(200).send({
+                    res.send({
+                        status: 200,
                         message: "Login successfully!",
-                        accessToken: tokenJwt
+                        credentials: {
+                            accessToken: tokenJwt,
+                            userId: user.id,
+                            email: user.email,
+                            fullName: user.fullName,
+                            role: user.RoleId
+                        }
                     })
                 } else {
                     res.status(400).send({

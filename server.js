@@ -97,7 +97,7 @@ app.post('/migration', (req, res) => {
 
 app.use('/uploads', express.static('uploads'));
 
-// require('./app/routes/auth.routes')(app);
+require('./app/routes/auth.routes')(app);
 // require('./app/routes/product.routes')(app);
 // require('./app/routes/warehouse.routes')(app);
 // require('./app/routes/cart.routes')(app);
@@ -133,7 +133,7 @@ require('./app/routes/payment.routes')(app);
 // });
 
 //Inisiasi port yang akan dipakai
-const PORT = 8000;
+const PORT = 3000;
 
 server.listen(PORT, () => {
     console.log(`Server is running on PORT ${PORT}`);

@@ -23,6 +23,27 @@ exports.upload = multer({
     storage: storage
 })
 
+exports.read = (req, res) => {
+    const serviceName = req.query.serviceName;
+    let condition = serviceName ? {
+        name: {
+            [Op.like]: `%${serviceName}%`
+        }
+    } : null;
+
+    Service.findAll({
+        where: condition,
+        include: {
+            model: db.category
+        }
+    }).then(result => {
+        res.status(200).send(result);
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "There is a problem in the server."
+        })
+    })
+}
 
 exports.create = (req, res) => {
     const ServiceId = '_svc' + Math.random().toString(36).substr(2, 9);
