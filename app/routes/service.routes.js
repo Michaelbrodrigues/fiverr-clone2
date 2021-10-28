@@ -8,8 +8,10 @@ module.exports = app => {
 
     let router = require('express').Router();
 
-    router.post('/', controller.upload.single('thumbnail'), controller.create);
-    router.get('/services', authJwt.verifyToken, controller.read);
+    router.post('/', authJwt.verifyToken, controller.upload.single('thumbnail'), controller.create);
+    router.get('/', controller.read);
+    router.delete('/:id', authJwt.verifyToken, controller.delete);
+    router.patch('/:id', controller.upload.single('thumbnail'), controller.update);
 
-    app.use(`${version.version}`, router);
+    app.use(`${version.version}/services`, router);
 }

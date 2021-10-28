@@ -24,20 +24,48 @@ exports.upload = multer({
 })
 
 exports.read = (req, res) => {
-    const serviceName = req.query.serviceName;
-    let condition = serviceName ? {
-        name: {
-            [Op.like]: `%${serviceName}%`
+    const title = req.query.title;
+    const UserId = req.query.UserId;
+    let condition = title ? {
+        title: {
+            [Op.like]: `%${title}%`
         }
     } : null;
 
+	let queryUserId = UserId ? {
+		UserId: {
+			[Op.like]: `%${UserId}%`
+		}
+	} : null;
+
     Service.findAll({
-        where: condition,
-        include: {
-            model: db.category
-        }
+        where: {
+			[Op.or]: [
+				{
+					title: {
+						[Op.like]: title ? `%${title}%` : `%%`
+					},
+					UserId: {
+						[Op.like]: UserId ? `%${UserId}%` : `%%`
+					}
+				}
+			]
+			
+		},
+        include: [
+			{
+				model: db.category
+			},
+			{
+				model: db.user
+			}
+		]
     }).then(result => {
-        res.status(200).send(result);
+        res.status(200).send({
+			success: true,
+			message: "Get All Service Has Been Successfully.",
+			data: result
+		});
     }).catch(err => {
         res.status(500).send({
             message: err.message || "There is a problem in the server."
@@ -47,6 +75,7 @@ exports.read = (req, res) => {
 
 exports.create = (req, res) => {
     const ServiceId = '_svc' + Math.random().toString(36).substr(2, 9);
+
     const service = {
         id: ServiceId,
         title: req.body.title,
@@ -59,10 +88,100 @@ exports.create = (req, res) => {
 
     Service.create(service)
         .then((data) => {
-            res.send(data)
+            res.send({
+				success: true,
+				message: " Service Has Been Added Successfully.",
+				data: data
+			})
         }).catch((err) => {
             res.status(500).send({
                 message: err.message || 'Some error occured while creating the message.'
             })
         })
+}
+
+exports.delete = (req, res) => {
+	const id = req.params.id;
+	Service.findByPk(id)
+		.then(result => {
+			if (result) {
+				const path = process.cwd() + '/uploads/images/service/' + result.thumbnail
+				fs.unlink(path, (err) => {
+					if (err) {
+						console.error(err)
+						return
+					}
+				})
+
+				Service.destroy({
+					where: {
+						id: id
+					}
+				}).then(() => {
+					res.status(200).send({
+						success: true,
+						message: `Service ID ${id} Deleted Successfully.`
+					})
+				}).catch(err => {
+					res.status(500).send({
+						message: err.message || "There is a problem in the server."
+					})
+				})
+			} else {
+				res.status(400).send({
+					message: `Service ID ${id} not found!`
+				});
+			}
+		}).catch(err => {
+			res.status(500).send({
+				message: err.message || "There is a problem in the server."
+			})
+		})
+}
+
+exports.update = (req, res) => {
+	const id = req.params.id;
+	Service.findByPk(id)
+		.then(result => {
+			if (result) {
+				if (req.file) {
+					const path = process.cwd() + '/uploads/images/service/' + result.thumbnail
+					fs.unlink(path, (err) => {
+						if (err) {
+							console.error(err)
+							return
+						}
+					})
+					var serviceUpd = {
+						title: req.body.title,
+						description: req.body.description,
+						thumbnail: req.file.filename,
+						fileFormat: req.body.fileFormat,
+						CategoryId: req.body.CategoryId,
+					}
+				}
+				Service.update(serviceUpd || req.body, {
+					where: {
+						id: id
+					}
+				}).then(() => {
+					res.send({
+						success: true,
+						message: `Service  ID ${id} Has Been Updated Successfully.`,
+					})
+				}).catch(err => {
+					res.status(500).send({
+						message: err.message || "There is a problem in the server."
+					})
+				})
+			} else {
+				res.status(400).send({
+					message: `Service ID ${id} not found!`
+				});
+			}
+		}).catch(err => {
+			res.status(500).send({
+				message: err.message || "There is a problem in the server."
+			})
+		})
 }

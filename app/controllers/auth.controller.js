@@ -58,11 +58,11 @@ exports.login = (req, res) => {
                         expiresIn: 10800 // 24 hours
                     });
                     res.send({
-                        status: 200,
+                        success: true,
                         message: "Login successfully!",
                         credentials: {
                             accessToken: tokenJwt,
-                            userId: user.id,
+                            UserId: user.id,
                             email: user.email,
                             fullName: user.fullName,
                             role: user.RoleId
