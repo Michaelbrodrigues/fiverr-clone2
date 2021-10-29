@@ -38,39 +38,78 @@ exports.read = (req, res) => {
 		}
 	} : null;
 
-    Service.findAll({
-        where: {
-			[Op.or]: [
-				{
-					title: {
-						[Op.like]: title ? `%${title}%` : `%%`
-					},
-					UserId: {
-						[Op.like]: UserId ? `%${UserId}%` : `%%`
-					}
-				}
-			]
+    // Service.findAll({
+    //     where: {
+	// 		[Op.or]: [
+	// 			{
+	// 				title: {
+	// 					[Op.like]: title ? `%${title}%` : `%%`
+	// 				},
+	// 				UserId: {
+	// 					[Op.like]: UserId ? `%${UserId}%` : `%%`
+	// 				}
+	// 			}
+	// 		]
 			
-		},
-        include: [
-			{
-				model: db.category
+	// 	},
+    //     include: [
+	// 		{
+	// 			model: db.category
+	// 		},
+	// 		{
+	// 			model: db.user
+	// 		}
+	// 	]
+    // }).then(result => {
+    //     res.status(200).send({
+	// 		success: true,
+	// 		message: "Get All Service Has Been Successfully.",
+	// 		data: result
+	// 	});
+    // }).catch(err => {
+    //     res.status(500).send({
+    //         message: err.message || "There is a problem in the server."
+    //     })
+    // })
+
+    const { page } = req.query;
+	const size = 2;
+
+	Service.findAndCountAll({
+		    where: {
+				[Op.or]: [
+					{
+						title: {
+							[Op.like]: title ? `%${title}%` : `%%`
+						},
+						UserId: {
+							[Op.like]: UserId ? `%${UserId}%` : `%%`
+						}
+					}
+				]
+
 			},
-			{
-				model: db.user
-			}
-		]
-    }).then(result => {
-        res.status(200).send({
+		    include: [
+				{
+					model: db.category
+				},
+				{
+					model: db.user
+				}
+			],
+		limit: size,
+		offset: page == 0 ? page * size : (page - 1) * size,
+	}).then(result => {
+		res.status(200).send({
 			success: true,
 			message: "Get All Service Has Been Successfully.",
 			data: result
 		});
-    }).catch(err => {
-        res.status(500).send({
-            message: err.message || "There is a problem in the server."
-        })
-    })
+	}).catch(err => {
+		res.status(500).send({
+			message: err.message || "There is a problem in the server."
+		})
+	})
 }
 
 exports.create = (req, res) => {
