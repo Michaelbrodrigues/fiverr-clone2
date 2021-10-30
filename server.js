@@ -19,7 +19,7 @@ const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
     cors: {
-        origin: "http://127.0.0.1:5500",
+        origin: ["http://127.0.0.1:5500", "http://127.0.0.1:8000"],
         methods: ["GET", "POST"],
     },
 });
@@ -106,31 +106,47 @@ require('./app/routes/auth.routes')(app);
 require('./app/routes/message.routes')(app);
 require('./app/routes/service.routes')(app);
 require('./app/routes/service-plan.routes')(app);
+require('./app/routes/service-plan-feature.routes')(app);
 require('./app/routes/purchasing.routes')(app);
 require('./app/routes/payment.routes')(app);
 
 // sends out the 10 most recent messages from recent to oldest
-// const emitMostRecentMessges = () => {
-//     controller.readSocketMessage()
-//         .then((result) => io.emit("chat message", result))
-//         .catch(console.log);
-// };
+const emitMostRecentMessges = () => {
+    controller.readSocketMessage()
+        .then((result) => io.emit("chat message", result))
+        .catch(console.log);
+};
+
+const emitPreviewRecentMessges = () => {
+	controller.readSocketMessage()
+		.then((result) => io.emit("preview message", result))
+		.catch(console.log);
+};
 
 // connects, creates message, and emits top 10 messages
-// io.on("connection", (socket) => {
-//     console.log("a user connected!");
-//     socket.on('chat message', (msg) => {
-//         controller.createSocketMessage(JSON.parse(msg))
-//             .then(() => {
-//                 emitMostRecentMessges();
-//             })
-//             .catch((err) => console.log(err));
-//     });
-//     // close event when user disconnects from app
-//     socket.on("disconnect", () => {
-//         console.log("user disconnected");
-//     });
-// });
+io.on("connection", (socket) => {
+    console.log("a user connected!");
+    socket.on('chat message', (msg) => {
+        controller.createSocketMessage(JSON.parse(msg))
+            .then(() => {
+                emitMostRecentMessges();
+            })
+            .catch((err) => console.log(err));
+    });
+
+	socket.on('preview message', (msg) => {
+		controller.createSocketMessage(JSON.parse(msg))
+			.then(() => {
+				emitPreviewRecentMessges();
+			})
+			.catch((err) => console.log(err));
+	});
+
+    // close event when user disconnects from app
+    socket.on("disconnect", () => {
+        console.log("user disconnected");
+    });
+});
 
 //Inisiasi port yang akan dipakai
 const PORT = 3000;

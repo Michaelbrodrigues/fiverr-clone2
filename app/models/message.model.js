@@ -9,6 +9,9 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.TEXT,
             allowNull: false
         },
+		ToUserId: {
+			type: Sequelize.STRING
+		},
     }, {
         tableName: 'Message'
     })
