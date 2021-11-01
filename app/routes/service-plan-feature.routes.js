@@ -8,7 +8,7 @@ module.exports = app => {
 	router.get('/', controller.read);
 	router.post('/', controller.create);
 	router.delete('/:id', controller.delete);
-	router.patch('/:id', controller.update);
+    router.patch('/:id', controller.update);
 
 	app.use(`${version.version}/services/plans/features`, router);
 }

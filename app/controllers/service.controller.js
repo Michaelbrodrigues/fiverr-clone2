@@ -26,6 +26,7 @@ exports.upload = multer({
 exports.read = (req, res) => {
     const title = req.query.title;
     const UserId = req.query.UserId;
+    const id = req.query.id;
 
 
     const { page } = req.query;
@@ -41,6 +42,9 @@ exports.read = (req, res) => {
 						},
 						UserId: {
 							[Op.like]: UserId ? `%${UserId}%` : `%%`
+						},
+						id: {
+							[Op.like]: id ? `%${id}%` : `%%`
 						}
 					}
 				]

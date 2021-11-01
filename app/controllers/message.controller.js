@@ -27,11 +27,14 @@ exports.create = (req, res) => {
 exports.read = (req, res) => {
 	const id = req.params.id;
 	const ids = req.params.ids;
+
+	const isReaded = req.query.isReaded;
     Message.findAll({
 		// attributes: [
 		// 	[db.Sequelize.fn("DISTINCT", db.Sequelize.col("UserId")), "UserId"],
 		// ],
 		where: {
+			isReaded: isReaded,
 			[Op.or]: [
 				{
 					UserId: ids,
@@ -40,7 +43,7 @@ exports.read = (req, res) => {
 				{
 					UserId: id,
 					ToUserId: ids
-				}
+				},
 			]
 		},
 		include: {
@@ -65,7 +68,7 @@ exports.preview = (req, res) => {
 		id
 	} = req.params;
 
-	db.sequelize.query(`select * from (select *, row_number() over (partition by "Message"."UserId" order by "Message"."createdAt" DESC) as row_number from "Message" LEFT OUTER JOIN "User" AS "User" ON "Message"."UserId" = "User"."id" WHERE "Message"."ToUserId" = '${id}') as rows where row_number = 1`, {
+	db.sequelize.query(`select * from (select *, row_number() over (partition by "Message"."groupId" order by "Message"."createdAt" DESC) as row_number from "Message" LEFT OUTER JOIN "User" AS "User" ON "Message"."UserId" = "User"."id" WHERE "Message"."ToUserId" = '${id}' OR "Message"."UserId" = '${id}') as rows where row_number = 1`, {
 			type: QueryTypes.SELECT
 		})
 		.then((data) => {
@@ -77,13 +80,13 @@ exports.preview = (req, res) => {
 		});
 }
 
-exports.readSocketPreviewMessage = () => {
+exports.readSocketPreviewMessage = (credentials) => {
 	return new Promise((resolve, reject) => {
-		db.sequelize.query(`select * from (select *, row_number() over (partition by "Message"."UserId" order by "Message"."createdAt" DESC) as row_number from "Message" LEFT OUTER JOIN "User" AS "User" ON "Message"."UserId" = "User"."id" WHERE "Message"."ToUserId" = '${id}') as rows where row_number = 1`, {
+		db.sequelize.query(`select * from (select *, row_number() over (partition by "Message"."groupId" order by "Message"."createdAt" DESC) as row_number from "Message" LEFT OUTER JOIN "User" AS "User" ON "Message"."UserId" = "User"."id" WHERE "Message"."ToUserId" = '${credentials.UserId}' OR "Message"."UserId" = '${credentials.UserId}') as rows where row_number = 1`, {
 			type: QueryTypes.SELECT
 		})
 		.then((data) => {
-			resolve(result);
+			resolve(data);
 		}).catch((err) => {
 			reject({
 				message: err.message || "There is a problem in the server."
@@ -92,18 +95,18 @@ exports.readSocketPreviewMessage = () => {
 	});
 }
 
-exports.readSocketMessage = () => {
+exports.readSocketMessage = (credentials) => {
     return new Promise((resolve, reject) => {
         Message.findAll({
             where: {
             		[Op.or]: [
 				{
-					UserId: ids,
-					ToUserId: id
+					UserId: credentials.UserId,
+					ToUserId: credentials.ToUserId
 				},
 				{
-					UserId: id,
-					ToUserId: ids
+					UserId: credentials.ToUserId,
+					ToUserId: credentials.UserId
 				}
 			]
             	},
@@ -128,8 +131,11 @@ exports.readSocketMessage = () => {
 exports.createSocketMessage = (message) => {
     const messageValue = {
         id: message.id,
+		isReaded: message.isReaded,
+        groupId: message.groupId,
         text: message.text,
         UserId: message.UserId,
+        ToUserId: message.ToUserId,
     }
     return new Promise((resolve, reject) => {
         Message.create(messageValue)

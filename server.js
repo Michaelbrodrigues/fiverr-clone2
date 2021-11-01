@@ -23,6 +23,7 @@ const io = require("socket.io")(server, {
         methods: ["GET", "POST"],
     },
 });
+
 app.use(cors());
 
 const bcrypt = require("bcrypt");
@@ -102,7 +103,7 @@ require('./app/routes/auth.routes')(app);
 // require('./app/routes/warehouse.routes')(app);
 // require('./app/routes/cart.routes')(app);
 // require('./app/routes/skill.routes')(app);
-// require('./app/routes/map.routes')(app);
+require('./app/routes/user.routes')(app);
 require('./app/routes/message.routes')(app);
 require('./app/routes/service.routes')(app);
 require('./app/routes/service-plan.routes')(app);
@@ -110,41 +111,71 @@ require('./app/routes/service-plan-feature.routes')(app);
 require('./app/routes/purchasing.routes')(app);
 require('./app/routes/payment.routes')(app);
 
-// sends out the 10 most recent messages from recent to oldest
-const emitMostRecentMessges = () => {
-    controller.readSocketMessage()
-        .then((result) => io.emit("chat message", result))
-        .catch(console.log);
+let users = [];
+
+
+const addUser = (UserId, SocketId) => {
+	!users.some(user=>user.UserId === UserId ) &&
+		users.push({
+			UserId, SocketId
+		});
 };
 
-const emitPreviewRecentMessges = () => {
-	controller.readSocketMessage()
-		.then((result) => io.emit("preview message", result))
+const removeUser = (SocketId) => {
+	users = users.filter((user) => user.SocketId !== SocketId);
+}
+
+const getUser = (UserId) => {
+	return users.find(user => user.UserId === UserId)
+}
+
+const emitPreviewRecentMessges = (credentials) => {
+	const user = getUser(`${credentials.UserId}`);
+	controller.readSocketPreviewMessage(credentials)
+		.then((result) => io.to(user.SocketId).emit("preview message", result))
+		.catch(console.log);
+};
+
+// sends out the 10 most recent messages from recent to oldest
+const emitMostRecentMessges = (credentials) => {
+	const user = getUser(`${credentials.ToUserId}`);
+	const user2 = getUser(`${credentials.UserId}`);
+	controller.readSocketMessage(credentials)
+		.then((result) => {
+			io.to(user.SocketId).to(user2.SocketId).emit("chat message", result)
+		})
 		.catch(console.log);
 };
 
 // connects, creates message, and emits top 10 messages
 io.on("connection", (socket) => {
     console.log("a user connected!");
+
+	socket.on('addUser', UserId => {
+		addUser(UserId, socket.id);
+		io.emit('getUsers', users);
+	})
+
     socket.on('chat message', (msg) => {
         controller.createSocketMessage(JSON.parse(msg))
-            .then(() => {
-                emitMostRecentMessges();
+            .then((res) => {
+				console.log(res);
+                emitMostRecentMessges(JSON.parse(msg));
             })
             .catch((err) => console.log(err));
     });
 
 	socket.on('preview message', (msg) => {
-		controller.createSocketMessage(JSON.parse(msg))
-			.then(() => {
-				emitPreviewRecentMessges();
-			})
-			.catch((err) => console.log(err));
+		emitPreviewRecentMessges(JSON.parse(msg));
 	});
 
     // close event when user disconnects from app
     socket.on("disconnect", () => {
         console.log("user disconnected");
+		removeUser(socket.id);
+		console.log(users);
+		io.emit('getUsers', users);
+
     });
 });
 

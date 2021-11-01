@@ -4,7 +4,18 @@ const Op = db.Sequelize.Op;
 
 
 exports.read = (req, res) => {
+
+	const { id } = req.query;
+	
 	ServicePlan.findAll({
+		where: {
+			[Op.or]: [{
+				id: {
+					[Op.like]: id ? `%${id}%` : `%%`
+				}
+			}]
+
+		},
 		include: [{
 				model: db.service
 			}

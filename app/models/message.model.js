@@ -12,6 +12,12 @@ module.exports = (sequelize, Sequelize) => {
 		ToUserId: {
 			type: Sequelize.STRING
 		},
+		isReaded: {
+			type: Sequelize.STRING
+		},
+		groupId: {
+			type: Sequelize.STRING
+		},
     }, {
         tableName: 'Message'
     })
