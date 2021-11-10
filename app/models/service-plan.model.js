@@ -12,10 +12,6 @@ module.exports = (sequelize, Sequelize) => {
         description: {
             type: Sequelize.TEXT
         },
-        price: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        }
     }, {
         tableName: 'ServicePlan'
     })

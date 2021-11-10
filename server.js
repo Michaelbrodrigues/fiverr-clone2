@@ -131,8 +131,13 @@ const getUser = (UserId) => {
 
 const emitPreviewRecentMessges = (credentials) => {
 	const user = getUser(`${credentials.UserId}`);
-	controller.readSocketPreviewMessage(credentials)
+	const user2 = getUser(`${credentials.ToUserId}`);
+	controller.readSocketPreviewMessage(credentials.UserId)
 		.then((result) => io.to(user.SocketId).emit("preview message", result))
+		.catch(console.log);
+
+	controller.readSocketPreviewMessage(credentials.ToUserId)
+		.then((result) => io.to(user2.SocketId).emit("preview message", result))
 		.catch(console.log);
 };
 
@@ -156,11 +161,21 @@ io.on("connection", (socket) => {
 		io.emit('getUsers', users);
 	})
 
-    socket.on('chat message', (msg) => {
+    socket.on('send message', (msg) => {
+		let credentials = JSON.parse(msg);
+		const user = getUser(`${credentials.ToUserId}`);
+		const user2 = getUser(`${credentials.UserId}`);
+
+		socket.join(user.SocketId);
         controller.createSocketMessage(JSON.parse(msg))
             .then((res) => {
 				console.log(res);
-                emitMostRecentMessges(JSON.parse(msg));
+                // emitMostRecentMessges(JSON.parse(msg));
+				controller.readSocketMessage(credentials)
+					.then((result) => {
+						io.to(user.SocketId).emit("chat message", result)
+					})
+					.catch(console.log);
             })
             .catch((err) => console.log(err));
     });

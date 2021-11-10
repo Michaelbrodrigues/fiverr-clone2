@@ -1,4 +1,5 @@
 const controller = require('../controllers/payment.controller');
+const version = require('../config/version.config');
 
 module.exports = app => {
 
@@ -7,5 +8,7 @@ module.exports = app => {
     router.put('/:id', controller.upload.single('receiptImage'), controller.update);
     router.put('/checking/:id', controller.checking);
 
-    app.use('/api/purchasing/payment', router);
+	router.post('/', controller.midPayment);
+
+    app.use(`${version.version}/purchasing/payment`, router);
 }

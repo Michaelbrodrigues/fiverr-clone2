@@ -94,16 +94,21 @@ exports.checking = (req, res) => {
             })
         })
 }
-// exports.read = (req, res) => {
-//     Purchasing.findAll({
-//         include: {
-//             model: db.payment
-//         }
-//     }).then(result => {
-//         res.status(200).send(result);
-//     }).catch(err => {
-//         res.status(500).send({
-//             message: err.message || "There is a problem in the server."
-//         })
-//     })
-// }
+
+exports.read = (req, res) => {
+    Purchasing.findAll({
+        include: {
+            model: db.payment
+        }
+    }).then(result => {
+        res.status(200).send(result);
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "There is a problem in the server."
+        })
+    })
+}
+
+exports.midPayment = (req, res) => {
+	res.send('midtrans');
+}

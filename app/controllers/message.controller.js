@@ -68,7 +68,7 @@ exports.preview = (req, res) => {
 		id
 	} = req.params;
 
-	db.sequelize.query(`select * from (select *, row_number() over (partition by "Message"."groupId" order by "Message"."createdAt" DESC) as row_number from "Message" LEFT OUTER JOIN "User" AS "User" ON "Message"."UserId" = "User"."id" WHERE "Message"."ToUserId" = '${id}' OR "Message"."UserId" = '${id}') as rows where row_number = 1`, {
+	db.sequelize.query(`select * from (select "Message".*, row_number() over (partition by "Message"."groupId" ORDER BY "Message"."createdAt" DESC) as row_number from "Message" LEFT OUTER JOIN "User" AS "User" ON "Message"."UserId" = "User"."id" WHERE "Message"."ToUserId" = '${id}' OR "Message"."UserId" = '${id}' ORDER BY "Message"."createdAt" DESC) as rows where row_number = 1`, {
 			type: QueryTypes.SELECT
 		})
 		.then((data) => {
@@ -82,7 +82,7 @@ exports.preview = (req, res) => {
 
 exports.readSocketPreviewMessage = (credentials) => {
 	return new Promise((resolve, reject) => {
-		db.sequelize.query(`select * from (select *, row_number() over (partition by "Message"."groupId" order by "Message"."createdAt" DESC) as row_number from "Message" LEFT OUTER JOIN "User" AS "User" ON "Message"."UserId" = "User"."id" WHERE "Message"."ToUserId" = '${credentials.UserId}' OR "Message"."UserId" = '${credentials.UserId}') as rows where row_number = 1`, {
+		db.sequelize.query(`select * from (select "Message".*, row_number() over (partition by "Message"."groupId" ORDER BY "Message"."createdAt" DESC) as row_number from "Message" LEFT OUTER JOIN "User" AS "User" ON "Message"."UserId" = "User"."id" WHERE "Message"."ToUserId" = '${credentials}' OR "Message"."UserId" = '${credentials}' ORDER BY "Message"."createdAt" DESC) as rows where row_number = 1`, {
 			type: QueryTypes.SELECT
 		})
 		.then((data) => {

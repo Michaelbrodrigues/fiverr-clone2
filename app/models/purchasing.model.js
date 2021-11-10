@@ -15,7 +15,20 @@ module.exports = (sequelize, Sequelize) => {
         },
         description: {
             type: Sequelize.TEXT
-        }
+        },
+		transactionId: {
+			type: Sequelize.STRING
+		},
+		vaNumber: {
+			type: Sequelize.STRING
+		},
+		bank: {
+			type: Sequelize.STRING
+		},
+		status: {
+			type: Sequelize.STRING
+		},
+
     }, {
         tableName: 'Purchasing'
     })

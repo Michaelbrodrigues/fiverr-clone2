@@ -6,9 +6,13 @@ module.exports = (sequelize, Sequelize) => {
             primaryKey: true
         },
         title: {
-            type: Sequelize.STRING,
+            type: Sequelize.TEXT,
             allowNull: false
         },
+		price: {
+			type: Sequelize.INTEGER,
+			allowNull: false
+		},
     }, {
         tableName: 'ServicePlanFeature'
     })

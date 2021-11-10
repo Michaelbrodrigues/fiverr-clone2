@@ -4,19 +4,26 @@ const Op = db.Sequelize.Op;
 
 
 exports.read = (req, res) => {
-	const { id } = req.query;
+	const { id, ServiceId } = req.query;
 	ServicePlanFeature.findAll({
 		where: {
 			[Op.or]: [{
 				id: {
 					[Op.like]: id ? `%${id}%` : `%%`
+				},
+				ServiceId: {
+					[Op.like]: ServiceId ? `%${ServiceId}%` : `%%`
 				}
 			}]
-
 		},
-		include: [{
-			model: db.servicePlan
-		}]
+		include: [
+			{
+				model: db.servicePlan
+			},
+			{
+				model: db.service
+			}
+		]
 	}).then(result => {
 		res.status(200).send({
 			success: true,
@@ -36,6 +43,9 @@ exports.create = (req, res) => {
 		id: ServicePlanFeatureId,
 		title: req.body.title,
 		ServicePlanId: req.body.ServicePlanId,
+		ServiceId: req.body.ServiceId,
+		ServicePlanId: req.body.ServicePlanId,
+		price: req.body.price,
 	}
 
 	ServicePlanFeature.create(servicePlan)

@@ -42,8 +42,8 @@ db.message.belongsTo(db.user);
 db.category.hasOne(db.service);
 db.service.belongsTo(db.category);
 
-db.service.hasMany(db.servicePlan);
-db.servicePlan.belongsTo(db.service);
+db.service.hasMany(db.servicePlanFeature);
+db.servicePlanFeature.belongsTo(db.service);
 
 db.user.hasMany(db.service);
 db.service.belongsTo(db.user);
@@ -51,10 +51,10 @@ db.service.belongsTo(db.user);
 db.servicePlan.hasMany(db.servicePlanFeature);
 db.servicePlanFeature.belongsTo(db.servicePlan);
 
-db.servicePlan.hasMany(db.purchasing);
+db.servicePlanFeature.hasMany(db.purchasing);
 db.user.hasMany(db.purchasing);
 
-db.purchasing.belongsTo(db.servicePlan);
+db.purchasing.belongsTo(db.servicePlanFeature);
 db.purchasing.belongsTo(db.user);
 
 db.purchasing.hasMany(db.payment);

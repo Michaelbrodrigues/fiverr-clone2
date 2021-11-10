@@ -56,6 +56,9 @@ exports.read = (req, res) => {
 				},
 				{
 					model: db.user
+				},
+				{
+					model: db.servicePlanFeature
 				}
 			],
 		}).then(result => {

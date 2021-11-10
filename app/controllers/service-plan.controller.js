@@ -16,10 +16,6 @@ exports.read = (req, res) => {
 			}]
 
 		},
-		include: [{
-				model: db.service
-			}
-		]
 	}).then(result => {
 		res.status(200).send({
 			success: true,
